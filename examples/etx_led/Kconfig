@@ -1,0 +1,33 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+comment "Applications added by EmbeTronicX (www.embetronicx.com)"
+
+config EXAMPLES_ETX_LED
+	tristate "EmbeTronicX LED app example"
+	default n
+	depends on ESP32_ETX_LED
+	---help---
+		Enable the EmbeTronicX LED app example
+
+if EXAMPLES_ETX_LED
+
+config EXAMPLES_ETX_LED_PROGNAME
+	string "Program name"
+	default "etx_led"
+	---help---
+		This is the name of the program that will be used when the NSH ELF
+		program is installed.
+
+config EXAMPLES_ETX_LED_PRIORITY
+	int "etx_led task priority"
+	default 100
+
+config EXAMPLES_ETX_LED_STACKSIZE
+	int "etx_led stack size"
+	default DEFAULT_TASK_STACKSIZE
+
+endif
+
