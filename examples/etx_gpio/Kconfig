@@ -3,28 +3,28 @@
 # see the file kconfig-language.txt in the NuttX tools repository.
 #
 
-config EXAMPLES_ETX_LED
-	tristate "EmbeTronicX LED app example"
+config EXAMPLES_ETX_GPIO
+	tristate "EmbeTronicX GPIO app example"
 	default n
-	depends on ESP32_ETX_LED
+	depends on ESP32_ETX_GPIO
 	---help---
-		Enable the EmbeTronicX LED app example
+		Enable the EmbeTronicX GPIO app example
 
-if EXAMPLES_ETX_LED
+if EXAMPLES_ETX_GPIO
 
-config EXAMPLES_ETX_LED_PROGNAME
+config EXAMPLES_ETX_GPIO_PROGNAME
 	string "Program name"
-	default "etx_led"
+	default "etx_gpio"
 	---help---
 		This is the name of the program that will be used when the NSH ELF
 		program is installed.
 
-config EXAMPLES_ETX_LED_PRIORITY
-	int "etx_led task priority"
+config EXAMPLES_ETX_GPIO_PRIORITY
+	int "etx_gpio task priority"
 	default 100
 
-config EXAMPLES_ETX_LED_STACKSIZE
-	int "etx_led stack size"
+config EXAMPLES_ETX_GPIO_STACKSIZE
+	int "etx_gpio stack size"
 	default DEFAULT_TASK_STACKSIZE
 
 endif
