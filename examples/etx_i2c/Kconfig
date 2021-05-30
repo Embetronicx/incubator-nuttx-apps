@@ -1,0 +1,31 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config EXAMPLES_ETX_I2C_ACCEL
+	tristate "EmbeTronicX I2C app example (ADXL345 Accelerometer)"
+	default n
+	depends on I2C && I2C_DRIVER
+	---help---
+		Enable the EmbeTronicX I2C app example (ADXL345 Accelerometer)
+
+if EXAMPLES_ETX_I2C_ACCEL
+
+config EXAMPLES_ETX_I2C_ACCEL_PROGNAME
+	string "Program name"
+	default "etx_i2c_adxl345"
+	---help---
+		This is the name of the program that will be used when the NSH ELF
+		program is installed.
+
+config EXAMPLES_ETX_I2C_ACCEL_PRIORITY
+	int "etx_i2c_adxl345 task priority"
+	default 100
+
+config EXAMPLES_ETX_I2C_ACCEL_STACKSIZE
+	int "etx_i2c_adx345 stack size"
+	default DEFAULT_TASK_STACKSIZE
+
+endif
+
