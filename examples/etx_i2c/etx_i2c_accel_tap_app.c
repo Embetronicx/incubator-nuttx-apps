@@ -1,5 +1,5 @@
 /****************************************************************************
- * examples/etx_i2c/etx_i2c_accel_app.c
+ * examples/etx_i2c/etx_i2c_accel_tap_app.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -35,7 +35,7 @@
 
 #include "etx_i2c_accel_app.h"
 
-#ifdef CONFIG_EXAMPLES_ETX_I2C_ACCEL_DATA
+#ifdef CONFIG_EXAMPLES_ETX_I2C_ACCEL_TAP
 
 
 /****************************************************************************
@@ -131,14 +131,17 @@ static int16_t ETX_I2C_Read( uint8_t reg, uint8_t* value, int16_t len )
  ****************************************************************************/
 static int16_t ETX_ADXL345_Init( void )
 {
-  int16_t ex = -1;
+  int16_t ex;
   uint8_t dev_id;
   
   // Reset all power settings
-  ETX_I2C_Write( ADXL345_RA_POWER_CTL, 0);
+  ex = ETX_I2C_Write( ADXL345_RA_POWER_CTL, 0x00);
   
-  // Read the devId
-  ETX_I2C_Read( ADXL345_RA_DEVID, &dev_id, 1);
+  if( ex >= 0 )
+  {
+    // Read the devId
+    ex = ETX_I2C_Read( ADXL345_RA_DEVID, &dev_id, 1);
+  }
   
   // Check the devId
   if( dev_id == 0xE5 )
@@ -146,15 +149,64 @@ static int16_t ETX_ADXL345_Init( void )
     printf("Device ID : 0x%X (Success!!!)\r\n", dev_id);
     
     //Set Output Rate to 100 Hz
-    ETX_I2C_Write( ADXL345_RA_BW_RATE, 0x0A);
+    ex = ETX_I2C_Write( ADXL345_RA_BW_RATE, 0x0A);
     
-    // ADXL345 into measurement mode
-    ETX_I2C_Write( ADXL345_RA_POWER_CTL, 0x08);
+    if( ex >= 0 )
+    {
+      // ADXL345 into measurement mode
+      ex = ETX_I2C_Write( ADXL345_RA_POWER_CTL, 0x08);
+    }
     
-    // Disable Interrupts
-    ETX_I2C_Write( ADXL345_RA_INT_ENABLE, 0x00 );
-    
-    ex = 0;
+    if( ex >= 0 )
+    {
+      // Disable Interrupts
+      ex = ETX_I2C_Write( ADXL345_RA_INT_ENABLE, 0x00 );
+    }
+  }
+  
+  return( ex );
+}
+
+/****************************************************************************
+ * Name: ETX_ADXL_SingleDoubleTapEn
+ *
+ * Details : This function enables the single and double tap functionality
+ ****************************************************************************/
+static int16_t ETX_ADXL_SingleDoubleTapEn( void )
+{
+  int16_t ex;
+  
+  // Enables the double tap in X, Y, Z axis (0b00000111)
+  ex = ETX_I2C_Write( ADXL345_RA_TAP_AXES, 0x07);
+  
+  if( ex >= 0 )
+  {
+    // Setting threshold
+    ex = ETX_I2C_Write( ADXL345_RA_THRESH_TAP, DT_THRESHOLD);
+  }
+  
+  if( ex >= 0 )
+  {
+    // Setting duration
+    ex = ETX_I2C_Write( ADXL345_RA_DUR, DT_DURATION);
+  }
+  
+  if( ex >= 0 )
+  {
+    // Setting latency
+    ex = ETX_I2C_Write( ADXL345_RA_LATENT, DT_LATENT);
+  }
+  
+  if( ex >= 0 )
+  {
+    // Setting window
+    ex = ETX_I2C_Write( ADXL345_RA_WINDOW, DT_WINDOW);
+  }
+  
+  if( ex >= 0 )
+  {
+    // Enable Single and Double Tap Interrupt
+    ex = ETX_I2C_Write( ADXL345_RA_INT_ENABLE, DT_INTERRUPT | ST_INTERRUPT );
   }
   
   return( ex );
@@ -166,39 +218,52 @@ static int16_t ETX_ADXL345_Init( void )
 
 static int etx_i2c_accel_task(int argc, char *argv[])
 {
-  int ret = 0;
-  int16_t X,Y,Z;
-  float   Xg,Yg,Zg;
+  int     ret = 0;
+  uint8_t intr;
     
   printf("ETX_I2C_ACCEL: Task Starting\n");
   
-  fd = open( ETX_I2C_DRIVER_PATH, O_WRONLY);
-  if( fd < 0 )
+  do
   {
-    printf("ETX_I2C_ACCEL:ERROR - Failed to open %s: %d\n",
-                                                   ETX_I2C_DRIVER_PATH, errno);
-    ret = -1;
-  }
-  
-  ret = ETX_ADXL345_Init();
-  
-  while( ret >= 0 )
-  {
-    // Read the X
-    ret = ETX_I2C_Read( ADXL345_RA_DATAX0, (uint8_t*)&X, 2);
+    fd = open( ETX_I2C_DRIVER_PATH, O_WRONLY);
+    if( fd < 0 )
+    {
+      printf("ETX_I2C_ACCEL:ERROR - Failed to open %s: %d\n",
+                                                     ETX_I2C_DRIVER_PATH, errno);
+      ret = -1;
+      break;
+    }
     
-    // Read the Y
-    ret = ETX_I2C_Read( ADXL345_RA_DATAY0, (uint8_t*)&Y, 2);
+    ret = ETX_ADXL345_Init();
+    if( ret < 0 )
+    {
+      break;
+    }
     
-    // Read the Z
-    ret = ETX_I2C_Read( ADXL345_RA_DATAZ0, (uint8_t*)&Z, 2);
+    ret = ETX_ADXL_SingleDoubleTapEn();
+    if( ret < 0 )
+    {
+      break;
+    }
     
-    Xg = ( X * ADXL345_MG2G_MULTIPLIER * STANDARD_GRAVITY );
-    Yg = ( Y * ADXL345_MG2G_MULTIPLIER * STANDARD_GRAVITY );
-    Zg = ( Z * ADXL345_MG2G_MULTIPLIER * STANDARD_GRAVITY );
-        
-    printf("Xg: %f, Yg: %f, Zg: %f\r\n", Xg, Yg, Zg);
-  }
+    while( ret >= 0 )
+    {
+      //Read the interrupt source
+      ret = ETX_I2C_Read( ADXL345_RA_INT_SOURCE, &intr, 1);
+      
+      if( intr & DT_INTERRUPT )
+      {
+        printf("Double Tap Detected!!!\r\n");
+      }
+      else if( intr & ST_INTERRUPT )
+      {
+        printf("Single Tap Detected!!!\r\n");
+      }
+      
+      usleep(1);
+    }
+    
+  }while( false );
 
   close(fd);
   printf("ETX_I2C_ACCEL: Task finishing\n");
@@ -237,4 +302,4 @@ int main(int argc, FAR char *argv[])
   return EXIT_SUCCESS;
 }
 
-#endif //#ifdef CONFIG_EXAMPLES_ETX_I2C_ACCEL_DATA
+#endif //#ifdef CONFIG_EXAMPLES_ETX_I2C_ACCEL_TAP

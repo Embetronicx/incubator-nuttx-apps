@@ -26,11 +26,21 @@
 
 #ifdef CONFIG_EXAMPLES_ETX_I2C_ACCEL
 
-#define ETX_I2C_DRIVER_PATH         "/dev/i2c1"     // I2C Driver path (I2C 1)
+#define ETX_I2C_DRIVER_PATH      "/dev/i2c1"  // I2C Driver path (I2C 1)
 
 // Conversion factors
-#define ADXL345_MG2G_MULTIPLIER     0.004           // 4mg per lsb
-#define STANDARD_GRAVITY            9.80665         // earth standard gravity
+#define ADXL345_MG2G_MULTIPLIER  0.004    // 4mg per lsb
+#define STANDARD_GRAVITY         9.80665  // earth standard gravity
+
+// Configuration values
+#define DT_THRESHOLD           255  // Double tap threshold (255*62.5mg = ~16g)
+#define DT_DURATION            240  // Double tap duration (240*625us = 150ms)
+#define DT_LATENT              140  // Double tap latency (140*1.25ms = 175ms)
+#define DT_WINDOW              255  // Double tap window (255*1.25ms= ~318ms)
+
+// Status bits
+#define DT_INTERRUPT                (1<<5) // Double tap interrupt bit
+#define ST_INTERRUPT                (1<<6) // Single tap interrupt bit
 
 // ADXL345 address when alt address pin is low (GND)
 #define ADXL345_ADDRESS             0x53
@@ -69,7 +79,5 @@
 #define ADXL345_RA_DATAZ1           0x37
 #define ADXL345_RA_FIFO_CTL         0x38
 #define ADXL345_RA_FIFO_STATUS      0x39
-
-
 
 #endif //#ifdef CONFIG_EXAMPLES_ETX_I2C_ACCEL

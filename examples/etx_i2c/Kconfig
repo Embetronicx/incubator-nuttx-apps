@@ -4,13 +4,23 @@
 #
 
 config EXAMPLES_ETX_I2C_ACCEL
-	tristate "EmbeTronicX I2C app example (ADXL345 Accelerometer)"
+	tristate "EmbeTronicX I2C app examples (ADXL345 Accelerometer)"
 	default n
 	depends on I2C && I2C_DRIVER
 	---help---
-		Enable the EmbeTronicX I2C app example (ADXL345 Accelerometer)
+		Enable the EmbeTronicX I2C app examples (ADXL345 Accelerometer)
 
 if EXAMPLES_ETX_I2C_ACCEL
+
+config EXAMPLES_ETX_I2C_ACCEL_DATA
+	tristate "EmbeTronicX ADXL345 Accelerometer data (x, Y, Z) read"
+	default n
+	depends on EXAMPLES_ETX_I2C_ACCEL
+	---help---
+		Enable the EmbeTronicX ADXL345 Accelerometer apps  that reads the data
+		X, Y, Z axis continuously.
+
+if EXAMPLES_ETX_I2C_ACCEL_DATA
 
 config EXAMPLES_ETX_I2C_ACCEL_PROGNAME
 	string "Program name"
@@ -18,6 +28,29 @@ config EXAMPLES_ETX_I2C_ACCEL_PROGNAME
 	---help---
 		This is the name of the program that will be used when the NSH ELF
 		program is installed.
+	
+endif
+	
+config EXAMPLES_ETX_I2C_ACCEL_TAP
+	tristate "EmbeTronicX ADXL345 Accelerometer Tap detection"
+	default n
+	depends on EXAMPLES_ETX_I2C_ACCEL
+	---help---
+		Enable the EmbeTronicX ADXL345 Accelerometer app that detects the single tap
+		and double tap continuously.
+
+if EXAMPLES_ETX_I2C_ACCEL_TAP
+
+config EXAMPLES_ETX_I2C_ACCEL_TAP_PROGNAME
+	string "Program name"
+	default "etx_i2c_adxl345_tap"
+	---help---
+		This is the name of the program that will be used when the NSH ELF
+		program is installed.
+	
+endif
+
+if EXAMPLES_ETX_I2C_ACCEL_TAP || EXAMPLES_ETX_I2C_ACCEL_DATA
 
 config EXAMPLES_ETX_I2C_ACCEL_PRIORITY
 	int "etx_i2c_adxl345 task priority"
@@ -26,6 +59,7 @@ config EXAMPLES_ETX_I2C_ACCEL_PRIORITY
 config EXAMPLES_ETX_I2C_ACCEL_STACKSIZE
 	int "etx_i2c_adx345 stack size"
 	default DEFAULT_TASK_STACKSIZE
+endif
 
 endif
 
