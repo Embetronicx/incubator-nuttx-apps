@@ -168,11 +168,11 @@ static int16_t ETX_ADXL345_Init( void )
 }
 
 /****************************************************************************
- * Name: ETX_ADXL_SingleDoubleTapEn
+ * Name: ETX_ADXL345_SingleDoubleTapEn
  *
  * Details : This function enables the single and double tap functionality
  ****************************************************************************/
-static int16_t ETX_ADXL_SingleDoubleTapEn( void )
+static int16_t ETX_ADXL345_SingleDoubleTapEn( void )
 {
   int16_t ex;
   
@@ -240,7 +240,7 @@ static int etx_i2c_accel_task(int argc, char *argv[])
       break;
     }
     
-    ret = ETX_ADXL_SingleDoubleTapEn();
+    ret = ETX_ADXL345_SingleDoubleTapEn();
     if( ret < 0 )
     {
       break;
