@@ -1,5 +1,5 @@
 /****************************************************************************
- * examples/nxflat/nxflat_main.c
+ * apps/examples/nxflat/nxflat_main.c
  *
  *   Copyright (C) 2009, 2011, 2017 Gregory Nutt. All rights reserved.
  *   Author: Gregory Nutt <gnutt@nuttx.org>
@@ -41,6 +41,7 @@
 #include <nuttx/compiler.h>
 
 #include <sys/mount.h>
+#include <sys/boardctl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -61,10 +62,6 @@
  * are required -- only the more obvious.
  */
 
-#ifdef CONFIG_BINFMT_DISABLE
-#  error "The binary loader is disabled (CONFIG_BINFMT_DISABLE)!"
-#endif
-
 #ifndef CONFIG_NXFLAT
 #  error "You must select CONFIG_NXFLAT in your configuration file"
 #endif
@@ -81,6 +78,9 @@
 #  error "You must not disable loadable modules via CONFIG_BINFMT_DISABLE in your configuration file"
 #endif
 
+#ifndef CONFIG_BOARDCTL_ROMDISK
+#  error "CONFIG_BOARDCTL_ROMDISK should be enabled in the configuration file"
+#endif
 /* Describe the ROMFS file system */
 
 #define SECTORSIZE   512
@@ -153,12 +153,18 @@ int main(int argc, FAR char *argv[])
   FAR char *args[1];
   int ret;
   int i;
+  struct boardioc_romdisk_s desc;
 
   /* Create a ROM disk for the ROMFS filesystem */
 
   message("Registering romdisk\n");
-  ret = romdisk_register(0, (FAR uint8_t *)romfs_img,
-                         NSECTORS(romfs_img_len), SECTORSIZE);
+
+  desc.minor    = 0;                                    /* Minor device number of the ROM disk. */
+  desc.nsectors = NSECTORS(romfs_img_len);              /* The number of sectors in the ROM disk */
+  desc.sectsize = SECTORSIZE;                           /* The size of one sector in bytes */
+  desc.image    = (FAR uint8_t *)romfs_img;             /* File system image */
+
+  ret = boardctl(BOARDIOC_ROMDISK, (uintptr_t)&desc);
   if (ret < 0)
     {
       errmsg("ERROR: romdisk_register failed: %d\n", ret);
@@ -173,7 +179,7 @@ int main(int argc, FAR char *argv[])
   ret = mount(ROMFSDEV, MOUNTPT, "romfs", MS_RDONLY, NULL);
   if (ret < 0)
     {
-      errmsg("ERROR: mount(%s,%s,romfs) failed: %s\n",
+      errmsg("ERROR: mount(%s,%s,romfs) failed: %d\n",
              ROMFSDEV, MOUNTPT, errno);
     }
 

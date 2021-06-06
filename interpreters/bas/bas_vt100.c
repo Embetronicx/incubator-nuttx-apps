@@ -41,6 +41,7 @@
 
 #include <sys/stat.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include <nuttx/vt100.h>
 
@@ -319,6 +320,7 @@ void vt100_scrolldown(int chn, uint16_t nlines)
 
       vt100_write(chn, g_revindex, sizeof(g_revindex));
     }
+}
 #endif
 
 /****************************************************************************

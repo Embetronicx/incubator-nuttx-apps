@@ -1,5 +1,5 @@
 /****************************************************************************
- * netutils/netlib/netlib_parseurl.c
+ * apps/netutils/netlib/netlib_parseurl.c
  *
  *   Copyright (C) 2019 Gregory Nutt. All rights reserved.
  *   Author: Sebastien Lorquet <sebastien@lorquet.fr>
@@ -113,21 +113,21 @@ int netlib_parseurl(FAR const char *str, FAR struct url_s *url)
 
   if (*src != ':')
     {
-      ret = -EINVAL;
+      return -EINVAL;
     }
 
   src++;
 
   if (*src != '/')
     {
-      ret = -EINVAL;
+      return -EINVAL;
     }
 
   src++;
 
   if (*src != '/')
     {
-      ret = -EINVAL;
+      return -EINVAL;
     }
 
   src++;

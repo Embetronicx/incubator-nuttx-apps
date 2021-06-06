@@ -1,5 +1,5 @@
 ############################################################################
-# apps/system/embedlog/Make.defs
+# apps/netutils/wakeonlan/Makefile
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -18,6 +18,13 @@
 #
 ############################################################################
 
-ifeq ($(CONFIG_SYSTEM_EMBEDLOG),y)
-CONFIGURED_APPS += $(APPDIR)/system/embedlog
-endif
+include $(APPDIR)/Make.defs
+
+PROGNAME  = $(CONFIG_NETUTILS_WAKEONLAN_PROGNAME)
+PRIORITY  = $(CONFIG_NETUTILS_WAKEONLAN_PRIORITY)
+STACKSIZE = $(CONFIG_NETUTILS_WAKEONLAN_STACKSIZE)
+MODULE    = $(CONFIG_NETUTILS_WAKEONLAN)
+
+MAINSRC = wol_main.c
+
+include $(APPDIR)/Application.mk
