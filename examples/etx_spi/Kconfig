@@ -1,0 +1,44 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config EXAMPLES_ETX_SPI_SSD1306_APP
+	tristate "EmbeTronicX SSD1306 OLED App"
+	default n
+	depends on ESP32_ETX_SPI && ESP32_ETX_GPIO
+	---help---
+		Enable the EmbeTronicX SSD1306 OLED app that write the text,
+		Image to the OLED Display.
+
+config EXAMPLES_ETX_SPI_SSD1306_APP_PROGNAME
+	string "Program name"
+	default "etx_spi_oled"
+	depends on EXAMPLES_ETX_SPI_SSD1306_APP
+	---help---
+		This is the name of the program that will be used when the NSH ELF
+		program is installed.
+
+config EXAMPLES_ETX_SPI_SSD1306_APP_PRIORITY
+	int "etx_spi_oled task priority"
+	default 100
+	depends on EXAMPLES_ETX_SPI_SSD1306_APP
+
+config EXAMPLES_ETX_SPI_SSD1306_APP_STACKSIZE
+	int "etx_spi_oled stack size"
+	default DEFAULT_TASK_STACKSIZE
+	depends on EXAMPLES_ETX_SPI_SSD1306_APP
+	
+config EXAMPLES_ETX_SPI_SSD1306_RST_PIN
+	int "SSD1306 Reset Pin number"
+	default 18
+	range 0 39
+	depends on EXAMPLES_ETX_SPI_SSD1306_APP
+
+config EXAMPLES_ETX_SPI_SSD1306_DC_PIN
+	int "SSD1306 Data/Command Pin number"
+	default 19
+	range 0 39
+	depends on EXAMPLES_ETX_SPI_SSD1306_APP
+	
+
