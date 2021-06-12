@@ -771,20 +771,22 @@ static int etx_spi_ssd1306_task(int argc, char *argv[])
   etx_spi_ssd1306_ClearDisplay();                 // Clear Display
   etx_spi_ssd1306_DeactivateScroll();
   
+  /* Print the Image */
+ 
+  //Set cursor
+  etx_spi_ssd1306_SetCursor(0,0);
+  
+  for(int i = 0; i < ( SSD1306_MAX_SEG * (SSD1306_MAX_LINE + 1) ); i++ )
+  {
+    ret = etx_spi_ssd1306_write(false, etx_logo[i]);
+  }
+  
   // infinite while which does nothing
   while( ret >= 0 )
   { 
-    /* Print the Image */
- 
-    //Set cursor
-    etx_spi_ssd1306_SetCursor(0,0);
-    etx_spi_ssd1306_InvertDisplay( true );         // Invert the dispaly : ON
-    for(int i = 0; i < ( SSD1306_MAX_SEG * (SSD1306_MAX_LINE + 1) ); i++ )
-    {
-      ret = etx_spi_ssd1306_write(false, etx_logo[i]);
-    }
+    etx_spi_ssd1306_InvertDisplay( true );    // Invert the dispaly : ON
     usleep( 500000 );
-    etx_spi_ssd1306_InvertDisplay( false );         // Invert the dispaly : OFF
+    etx_spi_ssd1306_InvertDisplay( false );   // Invert the dispaly : OFF
     usleep( 500000 );
   }
   
@@ -808,7 +810,7 @@ static int etx_spi_ssd1306_task(int argc, char *argv[])
   close(fd_spi);
   
   printf("ETX_SPI_SSD1306: ERROR - Task finishing ret = %d\n", ret);
-p,,,,,
+
   return EXIT_FAILURE;
 }
 
